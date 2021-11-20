@@ -1,17 +1,18 @@
-import Decentragram from '../abis/Decentragram.json'
 import React, { Component } from 'react';
-import Identicon from 'identicon.js';
-import Navbar from './Navbar'
-import Main from './Main'
-import Web3 from 'web3';
+import logo from '../logo.png';
 import './App.css';
+import Web3 from 'web3';
+import VInterface from '../abis/VInterface.json'
+import Vesting from '../abis/Vesting.json'
+import IERC20 from '../abis/IERC20.json'
+import styled from "styled-components";
+import gif from '../ggwt.gif';
 
-//Declare IPFS
-const ipfsClient = require('ipfs-http-client')
-const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' }) // leaving out the arguments will default to these values
+
+
 
 class App extends Component {
-
+  
   async componentWillMount() {
     await this.loadWeb3()
     await this.loadBlockchainData()
@@ -37,94 +38,91 @@ class App extends Component {
     this.setState({ account: accounts[0] })
     // Network ID
     const networkId = await web3.eth.net.getId()
-    const networkData = Decentragram.networks[networkId]
+    const networkData = 4
     if(networkData) {
-      const decentragram = new web3.eth.Contract(Decentragram.abi, networkData.address)
-      this.setState({ decentragram })
-      const imagesCount = await decentragram.methods.imageCount().call()
-      this.setState({ imagesCount })
-      // Load images
-      for (var i = 1; i <= imagesCount; i++) {
-        const image = await decentragram.methods.images(i).call()
-        this.setState({
-          images: [...this.state.images, image]
-        })
-      }
-      // Sort images. Show highest tipped images first
-      this.setState({
-        images: this.state.images.sort((a,b) => b.tipAmount - a.tipAmount )
-      })
-      this.setState({ loading: false})
+      const oldVest = new web3.eth.Contract(VInterface.abi, "0xf97af977b5077604e04E1760B873173F1dcCE6F9")
+      this.setState({oldVest})
+      const newVest = new web3.eth.Contract(Vesting.abi, "0x66949206D378900F201c5e6e47e045A0969be85c")
+      this.setState({newVest})
+      const token = new web3.eth.Contract(IERC20.abi, "0x4b928230A1C406556fb580A4D847e065F16bc6fA")
+            this.setState({token})
+
     } else {
-      window.alert('Decentragram contract not deployed to detected network.')
+      window.alert('Vesting contract not deployed to detected network.')
     }
   }
 
-  captureFile = event => {
-
-    event.preventDefault()
-    const file = event.target.files[0]
-    const reader = new window.FileReader()
-    reader.readAsArrayBuffer(file)
-
-    reader.onloadend = () => {
-      this.setState({ buffer: Buffer(reader.result) })
-      console.log('buffer', this.state.buffer)
-    }
+  claimAndApprove = description => {
+    console.log("Claiming And Approving")
+    this.state.oldVest.methods.claim().send({ from: this.state.account })
+    this.state.token.methods.approve("0x66949206D378900F201c5e6e47e045A0969be85c",10000).send({ from: this.state.account })
   }
 
-  uploadImage = description => {
-    console.log("Submitting file to ipfs...")
-
-    //adding file to the IPFS
-    ipfs.add(this.state.buffer, (error, result) => {
-      console.log('Ipfs result', result)
-      if(error) {
-        console.error(error)
-        return
-      }
-
-      this.setState({ loading: true })
-      this.state.decentragram.methods.uploadImage(result[0].hash, description).send({ from: this.state.account }).on('transactionHash', (hash) => {
-        this.setState({ loading: false })
-      })
-    })
-  }
-
-  tipImageOwner(id, tipAmount) {
-    this.setState({ loading: true })
-    this.state.decentragram.methods.tipImageOwner(id).send({ from: this.state.account, value: tipAmount }).on('transactionHash', (hash) => {
-      this.setState({ loading: false })
-    })
+  claimNFT = description => {
+    console.log("Claiming NFT")
+    this.state.newVest.methods.claimNFT().send({ from: this.state.account })
   }
 
   constructor(props) {
     super(props)
     this.state = {
       account: '',
-      decentragram: null,
-      images: [],
       loading: true
     }
 
-    this.uploadImage = this.uploadImage.bind(this)
-    this.tipImageOwner = this.tipImageOwner.bind(this)
-    this.captureFile = this.captureFile.bind(this)
-  }
+    this.claimNFT = this.claimNFT.bind(this)
+    this.claimAndApprove = this.claimAndApprove.bind(this)
 
+  }
   render() {
     return (
       <div>
-        <Navbar account={this.state.account} />
-        { this.state.loading
-          ? <div id="loader" className="text-center mt-5"><p>Loading...</p></div>
-          : <Main
-              images={this.state.images}
-              captureFile={this.captureFile}
-              uploadImage={this.uploadImage}
-              tipImageOwner={this.tipImageOwner}
-            />
-        }
+        <nav className="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+          <a
+            className="navbar-brand col-sm-3 col-md-2 mr-0"
+            href=""
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Gigawatt Founders NFT Launch
+          </a>
+        </nav>
+        <div className="container-fluid mt-5">
+          <div className="row">
+            <main role="main" className="col-lg-12 d-flex text-center">
+              
+              <div className="content mr-auto ml-auto">
+               
+                  <img src={gif} className="App-logo" alt="logo" />
+               
+                
+                <h1>Gigawatt Founders NFTs</h1>
+                <p>
+                  Follow the buttons to receive your Founders NFT, please only click button 2 after confirming the first 2 transactions
+                </p>
+                <button       style={{height: '30px', width : '200px'}}
+
+
+                      onClick={(e) => {
+                        e.preventDefault();
+                        this.claimAndApprove();
+                        
+                      }}
+                      ></button> 
+                
+                    <button     style={{height: '30px', width : '200px'}}
+
+                      onClick={(e) => {
+                        e.preventDefault();
+                        this.claimNFT();
+                        
+                      }}
+                      ></button> 
+              </div>
+              
+            </main>
+          </div>
+        </div>
       </div>
     );
   }

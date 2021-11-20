@@ -40,11 +40,11 @@ class App extends Component {
     const networkId = await web3.eth.net.getId()
     const networkData = 4
     if(networkData) {
-      const oldVest = new web3.eth.Contract(VInterface.abi, "0xf97af977b5077604e04E1760B873173F1dcCE6F9")
+      const oldVest = new web3.eth.Contract(VInterface.abi, "0x9117d454E0583eEbDaeb6C667006b382c6439615")
       this.setState({oldVest})
-      const newVest = new web3.eth.Contract(Vesting.abi, "0x66949206D378900F201c5e6e47e045A0969be85c")
+      const newVest = new web3.eth.Contract(Vesting.abi, "0x65fCD307a6819C6e3d3D8D0196c8fFe818aFb2ed")
       this.setState({newVest})
-      const token = new web3.eth.Contract(IERC20.abi, "0x4b928230A1C406556fb580A4D847e065F16bc6fA")
+      const token = new web3.eth.Contract(IERC20.abi, "0xD521E7c939A1c17C50cE3e9E3C058b8F8f7A45C3")
             this.setState({token})
 
     } else {
@@ -55,7 +55,7 @@ class App extends Component {
   claimAndApprove = description => {
     console.log("Claiming And Approving")
     this.state.oldVest.methods.claim().send({ from: this.state.account })
-    this.state.token.methods.approve("0x66949206D378900F201c5e6e47e045A0969be85c",10000).send({ from: this.state.account })
+    this.state.token.methods.approve("0x65fCD307a6819C6e3d3D8D0196c8fFe818aFb2ed",10000).send({ from: this.state.account })
   }
 
   claimNFT = description => {

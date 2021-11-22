@@ -6,7 +6,7 @@ import VInterface from '../abis/VInterface.json'
 import Vesting from '../abis/Vesting.json'
 import IERC20 from '../abis/IERC20.json'
 import styled from "styled-components";
-import gif from '../ggwt.gif';
+import gif from '../2ggwt.gif';
 
 
 
@@ -38,24 +38,32 @@ class App extends Component {
     this.setState({ account: accounts[0] })
     // Network ID
     const networkId = await web3.eth.net.getId()
-    const networkData = 4
+    const networkData = 137 == networkId
     if(networkData) {
-      const oldVest = new web3.eth.Contract(VInterface.abi, "0x9117d454E0583eEbDaeb6C667006b382c6439615")
+      const oldVest = new web3.eth.Contract(VInterface.abi, "0x1DBE25868679EDe8Eb93fED1138dc3d19ABb74B1")
       this.setState({oldVest})
-      const newVest = new web3.eth.Contract(Vesting.abi, "0x65fCD307a6819C6e3d3D8D0196c8fFe818aFb2ed")
+      const newVest = new web3.eth.Contract(Vesting.abi, "0xce7695743698d8e7635CC973568D8f70a45a1729")
       this.setState({newVest})
-      const token = new web3.eth.Contract(IERC20.abi, "0xD521E7c939A1c17C50cE3e9E3C058b8F8f7A45C3")
-            this.setState({token})
-
+      const token = new web3.eth.Contract(IERC20.abi, "0xc08e94e12ca1357DF36F3c16c3A1df5F84c7B801")
+      this.setState({token})
+      const appValue = await newVest.methods.beneficiaryBalance(accounts[0]).call()
+      this.setState({appValue})
+      console.log(appValue)
     } else {
-      window.alert('Vesting contract not deployed to detected network.')
+      window.alert('You are not connected to the Polygon network.')
     }
   }
 
   claimAndApprove = description => {
     console.log("Claiming And Approving")
+    console.log(this.state.appValue)
+
     this.state.oldVest.methods.claim().send({ from: this.state.account })
-    this.state.token.methods.approve("0x65fCD307a6819C6e3d3D8D0196c8fFe818aFb2ed",10000).send({ from: this.state.account })
+    console.log(this.state.appValue)
+
+    this.state.token.methods.approve("0x65fCD307a6819C6e3d3D8D0196c8fFe818aFb2ed", this.state.appValue).send({ from: this.state.account })
+    console.log(this.state.appValue)
+
   }
 
   claimNFT = description => {
@@ -67,7 +75,8 @@ class App extends Component {
     super(props)
     this.state = {
       account: '',
-      loading: true
+      loading: true,
+      appValue: 0
     }
 
     this.claimNFT = this.claimNFT.bind(this)

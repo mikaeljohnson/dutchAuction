@@ -61,7 +61,7 @@ class App extends Component {
     this.state.oldVest.methods.claim().send({ from: this.state.account })
     console.log(this.state.appValue)
 
-    this.state.token.methods.approve("0x65fCD307a6819C6e3d3D8D0196c8fFe818aFb2ed", this.state.appValue).send({ from: this.state.account })
+    this.state.token.methods.approve("0xce7695743698d8e7635CC973568D8f70a45a1729", this.state.appValue).send({ from: this.state.account })
     console.log(this.state.appValue)
 
   }

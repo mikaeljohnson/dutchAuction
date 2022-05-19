@@ -1,2 +1,0 @@
-Sorts out all images not by this address
-images: this.state.images.filter(image => image.author == 0x3b7B8d99827B1059459a745d7989d6548CFEEA87 )

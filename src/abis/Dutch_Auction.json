@@ -1,257 +1,323 @@
 {
 	"contractName": "Dutch_Auction",
 	"abi": [
-	{
-		"inputs": [
-			{
-				"internalType": "contract IERC20",
-				"name": "_paymentToken",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "_withdrawlAddress",
-				"type": "address"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "previousOwner",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "OwnershipTransferred",
-		"type": "event"
-	},
-	{
-		"inputs": [],
-		"name": "auctionCount",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "auctions",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "auctionNumber",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "timeStart",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "timeEnd",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "initalPrice",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "hourChange",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "minPrice",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "soldPrice",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "winner",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_auction",
-				"type": "uint256"
-			}
-		],
-		"name": "buyAuction",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_timeStart",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_timeEnd",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_hourChange",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_initalPrice",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_minPrice",
-				"type": "uint256"
-			}
-		],
-		"name": "createAuction",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "owner",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "paymentToken",
-		"outputs": [
-			{
-				"internalType": "contract IERC20",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "renounceOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "transferOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_auction",
-				"type": "uint256"
-			}
-		],
-		"name": "viewPrice",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_auction",
-				"type": "uint256"
-			}
-		],
-		"name": "winnerOf",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "withdrawl",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "withdrawlAddress",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	}
-]
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "_auction",
+					"type": "uint256"
+				}
+			],
+			"name": "buyAuction",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "_timeStart",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_timeEnd",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_hourChange",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_initalPrice",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_minPrice",
+					"type": "uint256"
+				}
+			],
+			"name": "createAuction",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "renounceOwnership",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "contract IERC20",
+					"name": "_paymentToken",
+					"type": "address"
+				},
+				{
+					"internalType": "address",
+					"name": "_withdrawlAddress",
+					"type": "address"
+				}
+			],
+			"stateMutability": "nonpayable",
+			"type": "constructor"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": true,
+					"internalType": "address",
+					"name": "previousOwner",
+					"type": "address"
+				},
+				{
+					"indexed": true,
+					"internalType": "address",
+					"name": "newOwner",
+					"type": "address"
+				}
+			],
+			"name": "OwnershipTransferred",
+			"type": "event"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "newOwner",
+					"type": "address"
+				}
+			],
+			"name": "transferOwnership",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "withdrawl",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "auctionCount",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "_auction",
+					"type": "uint256"
+				}
+			],
+			"name": "auctionInfo",
+			"outputs": [
+				{
+					"components": [
+						{
+							"internalType": "uint256",
+							"name": "auctionNumber",
+							"type": "uint256"
+						},
+						{
+							"internalType": "uint256",
+							"name": "timeStart",
+							"type": "uint256"
+						},
+						{
+							"internalType": "uint256",
+							"name": "timeEnd",
+							"type": "uint256"
+						},
+						{
+							"internalType": "uint256",
+							"name": "initalPrice",
+							"type": "uint256"
+						},
+						{
+							"internalType": "uint256",
+							"name": "hourChange",
+							"type": "uint256"
+						},
+						{
+							"internalType": "uint256",
+							"name": "minPrice",
+							"type": "uint256"
+						},
+						{
+							"internalType": "uint256",
+							"name": "soldPrice",
+							"type": "uint256"
+						},
+						{
+							"internalType": "address",
+							"name": "winner",
+							"type": "address"
+						}
+					],
+					"internalType": "struct Dutch_Auction.Auction",
+					"name": "",
+					"type": "tuple"
+				},
+				{
+					"internalType": "uint256",
+					"name": "price",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"name": "auctions",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "auctionNumber",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "timeStart",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "timeEnd",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "initalPrice",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "hourChange",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "minPrice",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "soldPrice",
+					"type": "uint256"
+				},
+				{
+					"internalType": "address",
+					"name": "winner",
+					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "owner",
+			"outputs": [
+				{
+					"internalType": "address",
+					"name": "",
+					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "paymentToken",
+			"outputs": [
+				{
+					"internalType": "contract IERC20",
+					"name": "",
+					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "_auction",
+					"type": "uint256"
+				}
+			],
+			"name": "viewPrice",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "_auction",
+					"type": "uint256"
+				}
+			],
+			"name": "winnerOf",
+			"outputs": [
+				{
+					"internalType": "address",
+					"name": "",
+					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "withdrawlAddress",
+			"outputs": [
+				{
+					"internalType": "address",
+					"name": "",
+					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		}
+	]
 }

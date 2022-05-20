@@ -17,9 +17,7 @@ class Navbar extends Component {
           Waifu House Dao Dutch Auctions
         </a>
       
-          <a href="/"> Home </a>
-          <a href="#post"> Post </a>
-          <a href="#profile"> Profile </a>
+      
 
        
 

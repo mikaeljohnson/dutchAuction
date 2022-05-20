@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
-import POApng from '../ggwt.gif'
+import POApng from '../star.png'
 import Container from 'react-bootstrap/Container';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
@@ -18,13 +18,13 @@ class Auction extends Component {
     return (
       <Col md="auto" key={key}>
     <Card style={{ width: '10rem' }} key={key}>
-    <Card.Img variant="top" src='../ggwt.gif' />
+    <Card.Img variant="top" src={POApng} />
     <Card.Body>
-      <Card.Title>Auction {auction.auctionNumber}</Card.Title>
+      <Card.Title>Auction {auction[0].auctionNumber}</Card.Title>
       <Card.Text>
-        Current Price: 
+        Current Price: {auction[1]}
       </Card.Text>
-      <Button variant="primary" onClick={(event) => {this.props.buyAuction(auction.auctionNumber, this.props.findPrice(auction.auctionNumber))}}>Buy Auction</Button>
+      <Button variant="primary" onClick={(event) => {this.props.buyAuction(auction[0].auctionNumber)}}>Buy Auction</Button>
     </Card.Body>
   </Card>
   </Col>

@@ -7,6 +7,11 @@
 					"internalType": "uint256",
 					"name": "_auction",
 					"type": "uint256"
+				},
+				{
+					"internalType": "address",
+					"name": "_winner",
+					"type": "address"
 				}
 			],
 			"name": "buyAuction",
@@ -16,6 +21,16 @@
 		},
 		{
 			"inputs": [
+				{
+					"internalType": "string",
+					"name": "_auctionIdentifier",
+					"type": "string"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_remaining",
+					"type": "uint256"
+				},
 				{
 					"internalType": "uint256",
 					"name": "_timeStart",
@@ -135,8 +150,28 @@
 				{
 					"components": [
 						{
+							"internalType": "string",
+							"name": "auctionIdentifier",
+							"type": "string"
+						},
+						{
 							"internalType": "uint256",
 							"name": "auctionNumber",
+							"type": "uint256"
+						},
+						{
+							"internalType": "uint256",
+							"name": "remaining",
+							"type": "uint256"
+						},
+						{
+							"internalType": "uint256",
+							"name": "spots",
+							"type": "uint256"
+						},
+						{
+							"internalType": "uint256",
+							"name": "reservedFrom",
 							"type": "uint256"
 						},
 						{
@@ -163,16 +198,6 @@
 							"internalType": "uint256",
 							"name": "minPrice",
 							"type": "uint256"
-						},
-						{
-							"internalType": "uint256",
-							"name": "soldPrice",
-							"type": "uint256"
-						},
-						{
-							"internalType": "address",
-							"name": "winner",
-							"type": "address"
 						}
 					],
 					"internalType": "struct Dutch_Auction.Auction",
@@ -199,8 +224,28 @@
 			"name": "auctions",
 			"outputs": [
 				{
+					"internalType": "string",
+					"name": "auctionIdentifier",
+					"type": "string"
+				},
+				{
 					"internalType": "uint256",
 					"name": "auctionNumber",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "remaining",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "spots",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "reservedFrom",
 					"type": "uint256"
 				},
 				{
@@ -227,16 +272,6 @@
 					"internalType": "uint256",
 					"name": "minPrice",
 					"type": "uint256"
-				},
-				{
-					"internalType": "uint256",
-					"name": "soldPrice",
-					"type": "uint256"
-				},
-				{
-					"internalType": "address",
-					"name": "winner",
-					"type": "address"
 				}
 			],
 			"stateMutability": "view",
@@ -269,6 +304,19 @@
 			"type": "function"
 		},
 		{
+			"inputs": [],
+			"name": "reservedCount",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
 			"inputs": [
 				{
 					"internalType": "uint256",
@@ -291,11 +339,30 @@
 			"inputs": [
 				{
 					"internalType": "uint256",
-					"name": "_auction",
+					"name": "_winner",
 					"type": "uint256"
 				}
 			],
-			"name": "winnerOf",
+			"name": "winner",
+			"outputs": [
+				{
+					"internalType": "address",
+					"name": "",
+					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"name": "winners",
 			"outputs": [
 				{
 					"internalType": "address",

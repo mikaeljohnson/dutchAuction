@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, Component } from 'react';
 import { HashRouter as Router, Route, Switch } from 'react-router-dom';
 import Navbar from './Navbar';
 import Auction from './Auction';
@@ -43,9 +43,9 @@ class App extends Component {
     const networkData = 4 === networkId
     
     if(networkData) {
-      const testToken = new web3.eth.Contract(_testToken.abi, "0x3FF373a39c94CFe9a581bb47784D6f56235Ff62B")
+      const testToken = new web3.eth.Contract(_testToken.abi, "0x41177a20179b930eb2482a256BC255d6354b1B0f")
       this.setState({testToken})
-      const dutchAuction = new web3.eth.Contract(_Dutch_Auction.abi, "0x6D69a4c47620e56CDbDb64E8E14AD58ada2Cc256")
+      const dutchAuction = new web3.eth.Contract(_Dutch_Auction.abi, "0x33B4B08E0455658f8B8E52C6C0681eD3c429DB5B")
       this.setState({dutchAuction})
       const data = await this.getData();
       this.setState({ auctions: data })
@@ -61,14 +61,11 @@ class App extends Component {
     for (var i = 0; i < auctionCount; i++) {
       const auction = await this.state.dutchAuction.methods.auctionInfo(i).call()
       auctions = [...auctions, auction]
+      console.log(auction)
     }
-    auctions = auctions.filter(_auction => _auction[0].soldPrice == 0)
+    auctions = auctions.filter(_auction => _auction[0].remaining != 0)
     console.log(auctions)
-    auctions.forEach(item =>{
-      this.findPrice(item.auctionNumber).then(function(result){
-          item.soldPrice = result;
-        })
-    })
+    
     return auctions;
   }
 
@@ -85,17 +82,18 @@ class App extends Component {
   }
 
   async approveSpend(price) {
-    this.state.testToken.methods.approve("0x6D69a4c47620e56CDbDb64E8E14AD58ada2Cc256", price).send({ from: this.state.account })
+    this.state.testToken.methods.approve("0x41177a20179b930eb2482a256BC255d6354b1B0f", price).send({ from: this.state.account })
 }
 
   async buyAuction(auction) {
-    this.state.dutchAuction.methods.buyAuction(auction).send({ from: this.state.account })
+    this.state.dutchAuction.methods.buyAuction(auction, "0x41177a20179b930eb2482a256BC255d6354b1B0f").send({ from: this.state.account })
 }
 
   constructor(props) {
     super(props)
     this.state = {
       account: '',
+      buyAddress:'',
       loading: true,
       auctions: [],
       prices: [],

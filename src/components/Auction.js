@@ -5,6 +5,7 @@ import POApng from '../star.png'
 import Container from 'react-bootstrap/Container';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
+import useState from 'react';
 class Auction extends Component {
   
   render() {
@@ -24,6 +25,10 @@ class Auction extends Component {
       <Card.Text>
         Current Price: {auction[1]}
       </Card.Text>
+      <Card.Text>
+        Remaining: {auction[0].remaining}
+      </Card.Text>
+      <input name="newPassword" type="text" value={this.state.newPassword} onChange={this.handleChange} />
       <Button variant="primary" onClick={(event) => {this.props.buyAuction(auction[0].auctionNumber)}}>Buy Auction</Button>
     </Card.Body>
   </Card>

@@ -28,7 +28,6 @@ class Auction extends Component {
       <Card.Text>
         Remaining: {auction[0].remaining}
       </Card.Text>
-      <input name="newPassword" type="text" value={this.state.newPassword} onChange={this.handleChange} />
       <Button variant="primary" onClick={(event) => {this.props.buyAuction(auction[0].auctionNumber)}}>Buy Auction</Button>
     </Card.Body>
   </Card>

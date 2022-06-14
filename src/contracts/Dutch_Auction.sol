@@ -616,35 +616,45 @@ contract Dutch_Auction is Ownable {
 
     uint256 public auctionCount;
 
+    uint256 public reservedCount;
+
+
     struct Auction {
+        string auctionIdentifier;
+        uint256 remaining;
+        uint256 spots;
+        uint256 reservedFrom;
         uint256 timeStart;
         uint256 timeEnd;
         uint256 initalPrice;
         uint256 hourChange;
         uint256 minPrice;
-        uint256 soldPrice;
-        address winner;
     }
 
-    mapping(uint256 => Auction) auctions;
+    mapping(uint256 => Auction) public auctions;
+    mapping(uint256 => address) public winners;
 
     constructor( IERC20 _paymentToken, address _withdrawlAddress ) {
 
         withdrawlAddress = _withdrawlAddress;
         paymentToken = _paymentToken;
         auctionCount = 0;
+        reservedCount = 0;
 
     }
 
-    function winnerOf( uint256 _auction ) public view returns(address) {
+    function auctionInfo( uint256 _auction ) public view returns( Auction memory, uint256 price ) {
         
-        require( auctions[_auction].timeStart > 0, "This auction has not started.");
-        require( auctions[_auction].soldPrice > 0, "This auction is on going.");
+        return ( auctions[_auction], viewPrice(_auction) );
+    }
+
+    function winner( uint256 _winner ) public view returns(address) {        
         
-        return auctions[_auction].winner;
+        return winners[_winner];
     }
 
     function viewPrice( uint256 _auction ) public view returns( uint256 ) {
+        require( block.timestamp < auctions[_auction].timeEnd, "This auction is finished." );
 
         uint256 hourGap = ( block.timestamp - auctions[_auction].timeStart ) / 1 minutes;
         uint256 price = auctions[_auction].initalPrice - ( auctions[_auction].hourChange * hourGap );
@@ -656,20 +666,24 @@ contract Dutch_Auction is Ownable {
         return price;
     }
 
-    function buyAuction( uint256 _auction ) public {
-
+    function buyAuction( uint256 _auction, address _winner) public {
         require( block.timestamp < auctions[_auction].timeEnd, "This auction is finished." );
+        require( auctions[_auction].timeStart > 0, "This auction has not started." );
 
         uint256 price = viewPrice(_auction);
         paymentToken.transferFrom(msg.sender, address(this), price);
+        uint256 winningSpot = auctions[_auction].reservedFrom + ( auctions[_auction].spots - auctions[_auction].remaining);
+        winners[winningSpot] = _winner;
+        auctions[_auction].remaining -= 1;
 
-        auctions[_auction].timeEnd = block.timestamp;
-        auctions[_auction].soldPrice = price;
-        auctions[_auction].winner = msg.sender;
-        
+        if(auctions[_auction].remaining == 0) {
+            // auction sold out: end auction
+            auctions[_auction].timeEnd = block.timestamp;
+        }
+                
     }
 
-    function createAuction( uint256 _timeStart, uint256 _timeEnd, uint256 _hourChange, uint256 _initalPrice, uint256 _minPrice ) public onlyOwner {
+    function createAuction( string memory _auctionIdentifier, uint256 _remaining, uint256 _timeStart, uint256 _timeEnd, uint256 _hourChange, uint256 _initalPrice, uint256 _minPrice ) public onlyOwner {
 
         if(_timeStart == 1) {
             auctions[auctionCount].timeStart = block.timestamp;
@@ -681,11 +695,15 @@ contract Dutch_Auction is Ownable {
         } else {
             auctions[auctionCount].timeEnd = _timeEnd;
         }
-
+        auctions[auctionCount].auctionIdentifier = _auctionIdentifier;
         auctions[auctionCount].initalPrice = _initalPrice;
         auctions[auctionCount].hourChange = _hourChange;
         auctions[auctionCount].minPrice = _minPrice;
+        auctions[auctionCount].remaining = _remaining;
+        auctions[auctionCount].spots = _remaining;
+        auctions[auctionCount].reservedFrom = reservedCount;
         
+        reservedCount = reservedCount + _remaining;
         auctionCount++;
         
     }

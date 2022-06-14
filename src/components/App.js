@@ -3,6 +3,7 @@ import { HashRouter as Router, Route, Switch } from 'react-router-dom';
 import Navbar from './Navbar';
 import Auction from './Auction';
 import BankGui from './BankGui';
+import RedeemBox from './RedeemBox';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import Container from 'react-bootstrap/Container';
@@ -103,6 +104,11 @@ async withdrawAuction(amount) {
   this.state.dutchAuction.methods.userWithdrawl(amount).send({ from: this.state.account })
 }
 
+async redeemAuction(auction,winner) {
+  //this.state.dutchAuction.methods.buyAuction(auction, contract).send({ from: this.state.account })
+  this.state.dutchAuction.methods.redeemValue(auction,winner).send({ from: this.state.account })
+}
+
   constructor(props) {
     super(props)
     this.state = {
@@ -118,6 +124,7 @@ async withdrawAuction(amount) {
     this.findPrice = this.findPrice.bind(this)
     this.depositAuction = this.depositAuction.bind(this)
     this.withdrawAuction = this.withdrawAuction.bind(this)
+    this.redeemAuction = this.redeemAuction.bind(this)
 
   }
 
@@ -132,6 +139,7 @@ async withdrawAuction(amount) {
 
 
             <BankGui account={this.state.account} auction={this.state.dutchAuction} bal={this.state.bal} depositAuction={this.depositAuction} withdrawAuction={this.withdrawAuction}/>
+            <RedeemBox redeemAuction={this.redeemAuction}/>
             <Auction auctions={this.state.auctions} buyAuction={this.buyAuction} findPrice={this.findPrice} />
 
           {/* { this.state.loading

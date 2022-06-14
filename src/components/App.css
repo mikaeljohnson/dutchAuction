@@ -34,6 +34,7 @@
 body{
   background-color: #000000;
   color: #61dafb;
+  padding: 25px;
 }
 
 card-text{
@@ -45,20 +46,22 @@ BankGui{
 }
 .BankGui{
   color: green;
-  background-color: #c206f1;
+  background-color: #890ba8;
   max-width: 400px;
   max-height: 200px;
   min-width: 400px;
   min-height: 200px;
+  padding: 25px;
 }
 .Auction{
   display:flex;
   display:grid;
   max-width: 500px;
-  max-height: 400px;
+  max-height: 450px;
   min-width: 500px;
-  min-height: 400px;
-  background-color: #f50202;
+  min-height: 450px;
+  background-color: #890ba8;
+  padding: 25px;
   
 }
 .Buybox{

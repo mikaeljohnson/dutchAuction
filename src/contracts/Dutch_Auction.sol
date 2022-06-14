@@ -227,9 +227,6 @@ interface IERC20Metadata is IERC20 {
 
 pragma solidity ^0.8.0;
 
-
-
-
 /**
  * @dev Implementation of the {IERC20} interface.
  *
@@ -614,13 +611,16 @@ contract Dutch_Auction is Ownable {
 
     IERC20 public paymentToken;
 
-    uint256 public auctionCount;
+    //@TODO check if we need to assign uninitalized variable to 0
+    uint256 public auctionCount = 0;
 
-    uint256 public reservedCount;
+    uint256 public reservedCount = 0;
 
+    uint256 public proceeds = 0;
 
     struct Auction {
         string auctionIdentifier;
+        uint256 auctionNumber;
         uint256 remaining;
         uint256 spots;
         uint256 reservedFrom;
@@ -629,18 +629,28 @@ contract Dutch_Auction is Ownable {
         uint256 initalPrice;
         uint256 hourChange;
         uint256 minPrice;
+        uint256 lastPrice;
+    }
+
+    struct Winner {
+        address winner;
+        address _address;
+        uint256 price;
     }
 
     mapping(uint256 => Auction) public auctions;
-    mapping(uint256 => address) public winners;
+    mapping(uint256 => Winner) public winners;
+    mapping(address => uint256) public userBalances;
 
     constructor( IERC20 _paymentToken, address _withdrawlAddress ) {
 
         withdrawlAddress = _withdrawlAddress;
         paymentToken = _paymentToken;
-        auctionCount = 0;
-        reservedCount = 0;
 
+    }
+
+    function viewBalance(address _user ) public view returns( uint256 balance) {
+        return userBalances[_user];
     }
 
     function auctionInfo( uint256 _auction ) public view returns( Auction memory, uint256 price ) {
@@ -648,37 +658,74 @@ contract Dutch_Auction is Ownable {
         return ( auctions[_auction], viewPrice(_auction) );
     }
 
-    function winner( uint256 _winner ) public view returns(address) {        
+    function winner( uint256 _winner ) public view returns( Winner memory ) {        
         
         return winners[_winner];
     }
 
     function viewPrice( uint256 _auction ) public view returns( uint256 ) {
-        require( block.timestamp < auctions[_auction].timeEnd, "This auction is finished." );
-
+        if(auctions[_auction].lastPrice != 0) {
+            return auctions[_auction].lastPrice;
+        }
         uint256 hourGap = ( block.timestamp - auctions[_auction].timeStart ) / 1 minutes;
+        
+        if( auctions[_auction].initalPrice < ( auctions[_auction].hourChange * hourGap ) ) {
+            
+            return auctions[_auction].minPrice;
+        }
+
         uint256 price = auctions[_auction].initalPrice - ( auctions[_auction].hourChange * hourGap );
 
-        if( price < auctions[_auction].minPrice ) {
-            price = auctions[_auction].minPrice;
-        }
 
         return price;
     }
 
-    function buyAuction( uint256 _auction, address _winner) public {
-        require( block.timestamp < auctions[_auction].timeEnd, "This auction is finished." );
+    function deposit( uint256 _amount ) public {
+        userBalances[msg.sender] += _amount;
+        paymentToken.transferFrom(msg.sender, address(this), _amount);
+    }
+    
+    // @TODO protect from reentrancey vulnerability 
+    function userWithdrawl( uint256 _amount ) public {
+        require( userBalances[msg.sender] > _amount, "You are attempting to withdrawl more tokens than you have deposited." );
+        userBalances[msg.sender] -= _amount;
+        paymentToken.transfer( msg.sender, _amount );
+
+    }
+
+    //@TODO spell check
+    // @TODO protect from reentrancey vulnerability 
+    function redeemValue( uint256 _auction, uint256 _winner ) public {
+        uint256 lPrice = auctions[_auction].lastPrice;
+        uint256 winPrice = winners[_winner].price;
+
+        require( winPrice > lPrice, "You do not have a redemeption to claim for this auction." );
+        require( winners[_winner].winner == msg.sender, "You may not claim redemptions for other people." );
+        
+        uint256 redemptionValue = winPrice - lPrice;
+        userBalances[msg.sender] += redemptionValue;
+
+        winners[_winner].price = lPrice;
+    }
+
+    // @TODO protect from reentrancey vulnerability 
+    function buyAuction( uint256 _auction, address __address) public {
+        require( auctions[_auction].lastPrice == 0, "This auction is finished." );
         require( auctions[_auction].timeStart > 0, "This auction has not started." );
 
         uint256 price = viewPrice(_auction);
-        paymentToken.transferFrom(msg.sender, address(this), price);
-        uint256 winningSpot = auctions[_auction].reservedFrom + ( auctions[_auction].spots - auctions[_auction].remaining);
-        winners[winningSpot] = _winner;
-        auctions[_auction].remaining -= 1;
+        require( userBalances[msg.sender] > price, "You do not have enough tokens in your current balance." );
 
-        if(auctions[_auction].remaining == 0) {
+        uint256 winningSpot = auctions[_auction].reservedFrom + ( auctions[_auction].spots - auctions[_auction].remaining);
+        winners[winningSpot].winner = msg.sender;
+        winners[winningSpot]._address = __address;
+        winners[winningSpot].price = price;
+        auctions[_auction].remaining -= 1;
+        userBalances[msg.sender] -= price;
+
+        if( auctions[_auction].remaining == 0 || block.timestamp > auctions[_auction].timeEnd ) {
             // auction sold out: end auction
-            auctions[_auction].timeEnd = block.timestamp;
+            endAuction( _auction, price );
         }
                 
     }
@@ -696,6 +743,7 @@ contract Dutch_Auction is Ownable {
             auctions[auctionCount].timeEnd = _timeEnd;
         }
         auctions[auctionCount].auctionIdentifier = _auctionIdentifier;
+        auctions[auctionCount].auctionNumber = auctionCount;
         auctions[auctionCount].initalPrice = _initalPrice;
         auctions[auctionCount].hourChange = _hourChange;
         auctions[auctionCount].minPrice = _minPrice;
@@ -708,10 +756,16 @@ contract Dutch_Auction is Ownable {
         
     }
 
-    function withdrawl() public onlyOwner {
+    function endAuction( uint256 _auction, uint256 _price ) internal {
+        auctions[_auction].timeEnd = block.timestamp;
+        auctions[_auction].lastPrice = _price;
+        proceeds += ( auctions[_auction].spots - auctions[_auction].remaining ) * _price; 
     
-        uint256 balance = paymentToken.balanceOf(address(this));    
-        paymentToken.transfer(withdrawlAddress, balance);
+    }
+
+    function ownerWithdrawl() public onlyOwner {   
+        paymentToken.transfer(withdrawlAddress, proceeds);
+        proceeds = 0;
     
     }
 

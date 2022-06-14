@@ -2,6 +2,7 @@ import React, { useState, Component } from 'react';
 import { HashRouter as Router, Route, Switch } from 'react-router-dom';
 import Navbar from './Navbar';
 import Auction from './Auction';
+import BankGui from './BankGui';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import Container from 'react-bootstrap/Container';
@@ -12,7 +13,8 @@ import Web3 from 'web3';
 import _testToken from '../abis/testToken.json'
 import _Dutch_Auction from '../abis/Dutch_Auction.json'
 
-
+const contract = "0xe8DB93A43f82cFf0E83Cb84Ac18222284Ad49800"
+const token = "0x231618CF7c595dFfC789a0B911d97eBF8B7E6cD1"
 class App extends Component {
   
   async componentWillMount() {
@@ -43,13 +45,15 @@ class App extends Component {
     const networkData = 4 === networkId
     
     if(networkData) {
-      const testToken = new web3.eth.Contract(_testToken.abi, "0x41177a20179b930eb2482a256BC255d6354b1B0f")
+      const testToken = new web3.eth.Contract(_testToken.abi, token)
       this.setState({testToken})
-      const dutchAuction = new web3.eth.Contract(_Dutch_Auction.abi, "0x33B4B08E0455658f8B8E52C6C0681eD3c429DB5B")
+      const dutchAuction = new web3.eth.Contract(_Dutch_Auction.abi, contract)
       this.setState({dutchAuction})
       const data = await this.getData();
       this.setState({ auctions: data })
       this.setState({ loading: false })
+      const bal = await this.state.dutchAuction.methods.viewBalance(this.state.account).call();
+      this.setState({bal: bal})
     } else {
       window.alert('You are not connected to the Ethereum network.')
     }
@@ -82,11 +86,21 @@ class App extends Component {
   }
 
   async approveSpend(price) {
-    this.state.testToken.methods.approve("0x41177a20179b930eb2482a256BC255d6354b1B0f", price).send({ from: this.state.account })
+    this.state.testToken.methods.approve(contract, price).send({ from: this.state.account })
 }
 
-  async buyAuction(auction) {
-    this.state.dutchAuction.methods.buyAuction(auction, "0x41177a20179b930eb2482a256BC255d6354b1B0f").send({ from: this.state.account })
+  async buyAuction(auction, winner) {
+    this.state.dutchAuction.methods.buyAuction(auction, winner).send({ from: this.state.account })
+}
+
+async depositAuction(amount) {
+  //this.state.dutchAuction.methods.buyAuction(auction, contract).send({ from: this.state.account })
+  this.state.dutchAuction.methods.deposit(amount).send({ from: this.state.account })
+}
+
+async withdrawAuction(amount) {
+  //this.state.dutchAuction.methods.buyAuction(auction, contract).send({ from: this.state.account })
+  this.state.dutchAuction.methods.userWithdrawl(amount).send({ from: this.state.account })
 }
 
   constructor(props) {
@@ -97,10 +111,13 @@ class App extends Component {
       loading: true,
       auctions: [],
       prices: [],
+      bal: -1,
     }
 
     this.buyAuction = this.buyAuction.bind(this)
     this.findPrice = this.findPrice.bind(this)
+    this.depositAuction = this.depositAuction.bind(this)
+    this.withdrawAuction = this.withdrawAuction.bind(this)
 
   }
 
@@ -112,6 +129,9 @@ class App extends Component {
             position: 'absolute', left: '50%', top: '50%',
             transform: 'translate(-50%, -50%)'
           }}>
+
+
+            <BankGui account={this.state.account} auction={this.state.dutchAuction} bal={this.state.bal} depositAuction={this.depositAuction} withdrawAuction={this.withdrawAuction}/>
             <Auction auctions={this.state.auctions} buyAuction={this.buyAuction} findPrice={this.findPrice} />
 
           {/* { this.state.loading

@@ -14,8 +14,11 @@ import Web3 from 'web3';
 import _testToken from '../abis/testToken.json'
 import _Dutch_Auction from '../abis/Dutch_Auction.json'
 
-const contract = "0xe8DB93A43f82cFf0E83Cb84Ac18222284Ad49800"
-const token = "0x231618CF7c595dFfC789a0B911d97eBF8B7E6cD1"
+// const contract = "0x6D4230FEb15ED41ebfd19DE25E042dFa6Db3b442"
+// const token = "0x793D8b9FD7D25B72776B2719F64b036d1f78FAaC"
+
+const contract = "0x6A1F87b71F7c1429feaE4dB2F69eeCaf901EFf96"
+const token = "0x2cf4fd8D1A7130d5AEB52BE93C83de582972bbf0"
 class App extends Component {
   
   async componentWillMount() {
@@ -130,16 +133,18 @@ async redeemAuction(auction,winner) {
 
   render() {
     return (
-      <div>        
+      <div className="body">        
           <Navbar account={this.state.account}/>
-          <div style={{
+          {/* <div style={{
             position: 'absolute', left: '50%', top: '50%',
             transform: 'translate(-50%, -50%)'
-          }}>
-
-
+          }}> */}
+          <div>
+          <div className="TokenBox">
             <BankGui account={this.state.account} auction={this.state.dutchAuction} bal={this.state.bal} depositAuction={this.depositAuction} withdrawAuction={this.withdrawAuction}/>
             <RedeemBox redeemAuction={this.redeemAuction}/>
+          </div>
+
             <Auction auctions={this.state.auctions} buyAuction={this.buyAuction} findPrice={this.findPrice} />
 
           {/* { this.state.loading

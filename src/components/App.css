@@ -32,7 +32,7 @@
 }
 
 body{
-  background-color: #000000;
+  background-color: #241d1d;
   color: #61dafb;
   padding: 25px;
 }
@@ -41,27 +41,29 @@ card-text{
   text: #61dafb;
 
 }
-BankGui{
-  color: green;
-}
+
 .BankGui{
-  color: green;
-  background-color: #890ba8;
+  color: rgb(137, 223, 218);
+  font-size: large;
+  background-color: #d497e4;
   max-width: 400px;
   max-height: 200px;
   min-width: 400px;
   min-height: 200px;
   padding: 25px;
+  margin: 25px;
+  border: #ffffff;
+  border-radius: 25px;
 }
 .Auction{
-  display:flex;
-  display:grid;
-  max-width: 500px;
-  max-height: 450px;
-  min-width: 500px;
-  min-height: 450px;
-  background-color: #890ba8;
+
+  background-color: #d497e4;
   padding: 25px;
+  margin: 50px;
+  border: #ffffff;
+  border-radius: 25px;
+  border-width: 10px;
+  
   
 }
 .Buybox{
@@ -73,6 +75,20 @@ BankGui{
   max-width:200px;
   max-height:200px;
 
+}
+.TokenBox{
+  display:flex;
+  padding: 25px;
+  margin: 25px;
+}
+
+.AuctionBOX{
+  height: 100%;
+  width: 100%;
+  padding: 25px;
+  position: fixed;
+
+  
 }
 
 @keyframes App-logo-spin {

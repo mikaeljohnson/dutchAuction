@@ -32,7 +32,7 @@ class BankGui extends Component {
   render() {
     
     return(
-      <Container className="BankGui">
+      <container className="BankGui">
     
             <Card.Text>
                 Amount: {this.props.bal}
@@ -45,7 +45,7 @@ class BankGui extends Component {
                 <input placeholder='Tokens to withdraw' value={this.state.inputValueWIT} onChange={this.handleChangeWIT}/>
                 <Button variant="primary" onClick={(event) => {this.props.withdrawAuction(this.state.inputValueWIT)}}>Withdraw funds</Button>
             </div>
-        </Container>)}
+        </container>)}
 }
 
 export default BankGui;

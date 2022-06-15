@@ -28,36 +28,37 @@ class Auction extends Component {
   render() {
 
     return(
-      <Container>
-          <Row md="auto">
+      <container className="AuctionBOX">
+          <Row>
       
 
     {this.props.auctions.map((auction, key) => {
     return (
-      <Col md="auto" key={key} className="Auction">
+      <Col key={key} className="Auction">
 
     <Card.Img variant="top" src={POApng} max-width="50px" max-height="50px"/>
     <Card.Body>
       <Card.Title>Auction {auction[0].auctionNumber}</Card.Title>
       <Card.Text>
-        Current Price: {auction[1]}
+        Auction Name: {auction[0].auctionIdentifier}
       </Card.Text>
       <Card.Text>
-        Remaining: {auction[0].remaining}
+        Current Price: {auction[1]} | Min price: {auction[0].minPrice}
+      </Card.Text>
+      <Card.Text>
+        Remaining: {auction[0].remaining} / {auction[0].spots}
       </Card.Text>
     </Card.Body>
       <div className="Buybox">
         <input placeholder='Enter the address you want whitelisted' value={this.state.inputValue} onChange={this.handleChange}/>
         <Button variant="primary" onClick={(event) => {this.props.buyAuction(auction[0].auctionNumber, this.state.inputValue)}}>Buy Auction</Button>
         </div>
-    
- 
   </Col>
     );
   })
 }
 </Row>
-        </Container>)}
+        </container>)}
 }
 
 export default Auction;

@@ -32,41 +32,17 @@ class RedeemBox extends Component {
   render() {
     
     return(
-      <Container className="BankGui">
-          {/* <Row md="auto">
-      
-
-    {this.props.auctions.map((auction, key) => {
-    return (
-      <Col md="auto" key={key}>
-    <Card style={{ width: '10rem' }} key={key}>
-    <Card.Img variant="top" src={POApng} />
-    <Card.Body>
-      <Card.Title>Auction {auction[0].auctionNumber}</Card.Title>
-      <Card.Text>
-        Current Price: {auction[1]}
-      </Card.Text>
-      <Card.Text>
-        Remaining: {auction[0].remaining}
-      </Card.Text>
-      <Button variant="primary" onClick={(event) => {this.props.buyAuction(auction[0].auctionNumber)}}>Buy Auction</Button>
-    </Card.Body>
-  </Card>
-  </Col>
-    );
-  })
-}
-</Row> */}
+      <container className="BankGui">
     
             <Card.Text>
-                Amount: {this.props.bal}
+                Amount: N/A
             </Card.Text>
              <input placeholder='Auction#'   value={this.state.inputValueDEP} onChange={this.handleChangeDEP}/>
              <input placeholder='Winner Slot' value={this.state.inputValueWIT} onChange={this.handleChangeWIT}/>
              <Button variant="primary" onClick={(event) => {this.props.redeemAuction(this.state.inputValueDEP,this.state.inputValueWIT)}}>Redeem</Button>
             
 
-        </Container>)}
+        </container>)}
 }
 
 export default RedeemBox;

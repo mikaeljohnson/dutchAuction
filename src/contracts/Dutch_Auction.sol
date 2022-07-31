@@ -611,10 +611,9 @@ contract ThreeList_Dutch_Auction is Ownable {
 
     IERC20 public paymentToken;
 
-    //@TODO check if we need to assign uninitalized variable to 0
-    uint256 public auctionCount = 0;
+    uint256 public auctionCount;
 
-    uint256 public reservedCount = 0;
+    uint256 public reservedCount;
 
     struct Auction {
         string auctionIdentifier;

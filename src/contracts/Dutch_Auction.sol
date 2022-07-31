@@ -605,7 +605,7 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
 
 pragma solidity ^ 0.8.4;
 
-contract Dutch_Auction is Ownable {
+contract ThreeList_Dutch_Auction is Ownable {
 
     address public withdrawlAddress;
 
@@ -615,8 +615,6 @@ contract Dutch_Auction is Ownable {
     uint256 public auctionCount = 0;
 
     uint256 public reservedCount = 0;
-
-    uint256 public proceeds = 0;
 
     struct Auction {
         string auctionIdentifier;
@@ -630,6 +628,7 @@ contract Dutch_Auction is Ownable {
         uint256 hourChange;
         uint256 minPrice;
         uint256 lastPrice;
+        uint256 collected;
     }
 
     struct Winner {
@@ -667,7 +666,7 @@ contract Dutch_Auction is Ownable {
         if(auctions[_auction].lastPrice != 0) {
             return auctions[_auction].lastPrice;
         }
-        uint256 hourGap = ( block.timestamp - auctions[_auction].timeStart ) / 1 minutes;
+        uint256 hourGap = ( block.timestamp - auctions[_auction].timeStart ) / 1 hours;
         
         if( auctions[_auction].initalPrice < ( auctions[_auction].hourChange * hourGap ) ) {
             
@@ -676,16 +675,14 @@ contract Dutch_Auction is Ownable {
 
         uint256 price = auctions[_auction].initalPrice - ( auctions[_auction].hourChange * hourGap );
 
-
         return price;
     }
 
     function deposit( uint256 _amount ) public {
-        userBalances[msg.sender] += _amount;
         paymentToken.transferFrom(msg.sender, address(this), _amount);
+        userBalances[msg.sender] += _amount;
     }
     
-    // @TODO protect from reentrancey vulnerability 
     function userWithdrawl( uint256 _amount ) public {
         require( userBalances[msg.sender] > _amount, "You are attempting to withdrawl more tokens than you have deposited." );
         userBalances[msg.sender] -= _amount;
@@ -693,22 +690,23 @@ contract Dutch_Auction is Ownable {
 
     }
 
-    //@TODO spell check
-    // @TODO protect from reentrancey vulnerability 
     function redeemValue( uint256 _auction, uint256 _winner ) public {
+        require( block.timestamp <= auctions[_auction].timeEnd + 7 days, "The auctions redemption period of 7 days has expired." );
+        
         uint256 lPrice = auctions[_auction].lastPrice;
         uint256 winPrice = winners[_winner].price;
-
+        
         require( winPrice > lPrice, "You do not have a redemeption to claim for this auction." );
         require( winners[_winner].winner == msg.sender, "You may not claim redemptions for other people." );
         
         uint256 redemptionValue = winPrice - lPrice;
+        winners[_winner].price = lPrice;
+        auctions[_auction].collected -= redemptionValue;
         userBalances[msg.sender] += redemptionValue;
 
-        winners[_winner].price = lPrice;
     }
 
-    // @TODO protect from reentrancey vulnerability 
+    // @TODO test winning spot intricacies
     function buyAuction( uint256 _auction, address __address) public {
         require( auctions[_auction].lastPrice == 0, "This auction is finished." );
         require( auctions[_auction].timeStart > 0, "This auction has not started." );
@@ -717,12 +715,13 @@ contract Dutch_Auction is Ownable {
         require( userBalances[msg.sender] > price, "You do not have enough tokens in your current balance." );
 
         uint256 winningSpot = auctions[_auction].reservedFrom + ( auctions[_auction].spots - auctions[_auction].remaining);
+        userBalances[msg.sender] -= price;
         winners[winningSpot].winner = msg.sender;
         winners[winningSpot]._address = __address;
         winners[winningSpot].price = price;
+        auctions[_auction].collected += price;
         auctions[_auction].remaining -= 1;
-        userBalances[msg.sender] -= price;
-
+ 
         if( auctions[_auction].remaining == 0 || block.timestamp > auctions[_auction].timeEnd ) {
             // auction sold out: end auction
             endAuction( _auction, price );
@@ -730,22 +729,14 @@ contract Dutch_Auction is Ownable {
                 
     }
 
-    function createAuction( string memory _auctionIdentifier, uint256 _remaining, uint256 _timeStart, uint256 _timeEnd, uint256 _hourChange, uint256 _initalPrice, uint256 _minPrice ) public onlyOwner {
+    function createAuction( string memory _auctionIdentifier, uint256 _remaining, uint256 _initalPrice, uint256 _minPrice ) public onlyOwner {
 
-        if(_timeStart == 1) {
-            auctions[auctionCount].timeStart = block.timestamp;
-        } else {
-            auctions[auctionCount].timeStart = _timeStart;
-        }
-        if(_timeEnd == 1) {
-            auctions[auctionCount].timeEnd = block.timestamp + 5 days;
-        } else {
-            auctions[auctionCount].timeEnd = _timeEnd;
-        }
+        auctions[auctionCount].timeStart = block.timestamp;
+        auctions[auctionCount].timeEnd = block.timestamp + 2 days;
         auctions[auctionCount].auctionIdentifier = _auctionIdentifier;
         auctions[auctionCount].auctionNumber = auctionCount;
         auctions[auctionCount].initalPrice = _initalPrice;
-        auctions[auctionCount].hourChange = _hourChange;
+        auctions[auctionCount].hourChange = ( _initalPrice - _minPrice ) / 48;
         auctions[auctionCount].minPrice = _minPrice;
         auctions[auctionCount].remaining = _remaining;
         auctions[auctionCount].spots = _remaining;
@@ -759,16 +750,13 @@ contract Dutch_Auction is Ownable {
     function endAuction( uint256 _auction, uint256 _price ) internal {
         auctions[_auction].timeEnd = block.timestamp;
         auctions[_auction].lastPrice = _price;
-        proceeds += ( auctions[_auction].spots - auctions[_auction].remaining ) * _price; 
     
     }
 
-    function ownerWithdrawl() public onlyOwner {   
-        paymentToken.transfer(withdrawlAddress, proceeds);
-        proceeds = 0;
-    
+    function collectProceeds(uint256 _auction) public onlyOwner {
+        require( block.timestamp > auctions[_auction].timeEnd + 7 days, "This auction is still in its redemption period." );
+        paymentToken.transfer( withdrawlAddress, auctions[_auction].collected );
     }
-
 
 }
 

@@ -1119,9 +1119,9 @@ contract Three_LaunchPad_NFT is ERC721, Ownable {
 
     uint256 private supply;
     uint256 private maxSupply;
-    uint256 private price;
-    uint256 private quorum;
-    uint256 private accumulatedValue;
+    uint256 private price; // Mint Price
+    uint256 private quorum; // % of Minted
+    uint256 private accumulatedValue; // Value gained from mint - redemptions 
 
     string private baseURI;
     string private baseExtension = ".json";
@@ -1184,7 +1184,8 @@ contract Three_LaunchPad_NFT is ERC721, Ownable {
     }
 
     function voteOfNoConfidence() public {
-        
+        require(balanceOf(msg.sender) > 0, "You do not own an NFT.");
+
     }
 
 }
